@@ -34,10 +34,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNote() {
-        // Находим нужную заметку, если ее нет, то выходим
-        val note = notes.find {
-            it.id == currentNote
-        } ?: return
+        // заметку
+        val note = notes[currentNote]
 
         noteName?.setText(note.name)
         noteDescription?.setText(note.description)
@@ -45,18 +43,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showNextNote(view: View) {
-        if (currentNote <= notes.size - 1) {
+        if (currentNote < notes.size - 1) {
             currentNote++
+            showNote()
         }
-        showNote()
     }
 
     fun showPrevNote(view: View) {
         if (currentNote > 0) {
             currentNote--
+            showNote()
         }
-
-        showNote()
     }
 
     fun showLastNote(view: View) {
@@ -70,10 +67,8 @@ class MainActivity : AppCompatActivity() {
 
         // notes.add(TaskModel(notes.size, name, description))
 
-        // Находим нужную заметку, если ее нет, то выходим
-        val note = notes.find {
-            it.id == currentNote
-        } ?: return
+        // Находим нужную заметку
+        val note = notes[currentNote]
 
         note.name = name
         note.description = description

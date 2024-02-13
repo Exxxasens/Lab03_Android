@@ -2,30 +2,97 @@ package com.example.lab03
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
 import android.widget.EditText
-
-public class TaskModel(val id: Int, val name: String, val description: String) {
-}
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
-    val notes = arrayOf(
-        TaskModel(0, "First", "Desc"),
-        TaskModel(1, "Second", "Desc"),
-        TaskModel(2, "Third", "Desc")
+    private var noteName: EditText? = null
+    private var noteDescription: EditText? = null
+    private var addNoteButton: Button? = null
+    private var saveNoteButton: Button? = null
+    private var showNoteButton: Button? = null
+
+    private var notes = mutableListOf<TaskModel>(
+        TaskModel(0, "Заметка про лабы", "Нужно все сделать"),
     )
 
-    val noteName = findViewById<EditText>(R.id.editNote)
-    val noteDescription = findViewById<EditText>(R.id.editNoteDescription)
-    val addNoteButton = findViewById<Button>(R.id.addNoteButton)
-    val saveNoteButton = findViewById<Button>(R.id.saveNoteButton)
-    val showNoteButton = findViewById<Button>(R.id.showNoteButton)
+    private var currentNote = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        noteName = findViewById(R.id.editNoteName)
+        noteDescription = findViewById(R.id.editNoteDescription)
+        addNoteButton = findViewById(R.id.addNoteButton)
+        saveNoteButton = findViewById(R.id.saveNoteButton)
+        showNoteButton = findViewById(R.id.showNoteButton)
 
+        showNote()
+    }
 
+    private fun showNote() {
+        // Находим нужную заметку, если ее нет, то выходим
+        val note = notes.find {
+            it.id == currentNote
+        } ?: return
+
+        noteName?.setText(note.name)
+        noteDescription?.setText(note.description)
 
     }
+
+    fun showNextNote(view: View) {
+        if (currentNote <= notes.size - 1) {
+            currentNote++
+        }
+        showNote()
+    }
+
+    fun showPrevNote(view: View) {
+        if (currentNote > 0) {
+            currentNote--
+        }
+
+        showNote()
+    }
+
+    fun showLastNote(view: View) {
+        currentNote = notes.size - 1
+        showNote()
+    }
+
+    fun saveNote(view: View) {
+        val name = noteName?.text.toString()
+        val description = noteDescription?.text.toString()
+
+        // notes.add(TaskModel(notes.size, name, description))
+
+        // Находим нужную заметку, если ее нет, то выходим
+        val note = notes.find {
+            it.id == currentNote
+        } ?: return
+
+        note.name = name
+        note.description = description
+
+        showToast("Заметка отредактирована")
+
+    }
+
+    fun addNote(view: View) {
+        notes.add(TaskModel(notes.size, "", ""))
+        currentNote = notes.size - 1
+        showNote()
+
+        showToast("Добавлена новая заметка")
+    }
+
+    private fun showToast(text: String) {
+        Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT)
+            .show()
+    }
+
 }

@@ -5,6 +5,6 @@
     <string name="button_add_text">Добавить</string>
     <string name="button_save_text">Сохранить</string>
     <string name="button_random_text">Показать последнюю заметку</string>
-    <string name="button_prev">&lt;-</string>
-    <string name="button_next">-&gt;</string>
+    <string name="button_next_content_description">Следующая заметка</string>
+    <string name="button_prev_content_description">Предыдущая заметка</string>
 </resources>

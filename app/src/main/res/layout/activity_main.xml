@@ -109,6 +109,7 @@
         android:textAllCaps="true"
         android:onClick="showLastNote"
 
+
         android:textColor="@color/white"
 
         android:background="@drawable/custom_button"

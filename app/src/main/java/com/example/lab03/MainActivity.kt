@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
 
 
     /* Lab04 */
-
     protected override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt("CURRENT_NOTE", currentNote)
@@ -109,12 +108,7 @@ class MainActivity : AppCompatActivity() {
         savedInstanceState: Bundle
     ) {
         super.onRestoreInstanceState(savedInstanceState)
-
-        currentNote = savedInstanceState.getInt("CURRENT_NOTE")
-        noteName?.setText(savedInstanceState.getString("NOTE_NAME"))
-        noteDescription?.setText(savedInstanceState.getString("NOTE_DESCRIPTION"))
-
-        val savedNotes = savedInstanceState.getParcelableArrayList<TaskModel>("NOTES")?.toMutableList()
+        val savedNotes = savedInstanceState.getParcelableArrayList<TaskModel>("NOTES")
 
         if (savedNotes != null) {
             notes.clear()
@@ -122,6 +116,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         showNote()
+
+        currentNote = savedInstanceState.getInt("CURRENT_NOTE")
+        noteName?.setText(savedInstanceState.getString("NOTE_NAME"))
+        noteDescription?.setText(savedInstanceState.getString("NOTE_DESCRIPTION"))
+
+
         showToast("Восстановление данных")
 
     }
@@ -153,5 +153,7 @@ class MainActivity : AppCompatActivity() {
     // onDestroy: Этот метод вызывается перед уничтожением экземпляра активности. Здесь можно освобождать ресурсы и завершать работу.
     override fun onDestroy() {
         super.onDestroy()
+
+        showToast("Активность завершена")
     }
 }

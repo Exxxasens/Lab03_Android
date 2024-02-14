@@ -32,4 +32,5 @@ class TaskModel(val id: Int, var name: String, var description: String) : Parcel
         }
     }
 
+
 }

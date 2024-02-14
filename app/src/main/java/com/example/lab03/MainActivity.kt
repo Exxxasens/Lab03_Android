@@ -2,6 +2,7 @@ package com.example.lab03
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -93,6 +94,38 @@ class MainActivity : AppCompatActivity() {
 
 
     /* Lab04 */
+
+    protected override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("CURRENT_NOTE", currentNote)
+        outState.putString("NOTE_NAME", noteName?.text.toString())
+        outState.putString("NOTE_DESCRIPTION", noteDescription?.text.toString())
+        outState.putParcelableArrayList("NOTES", ArrayList(notes))
+
+        showToast("Сохранение данных")
+    }
+
+    override fun onRestoreInstanceState(
+        savedInstanceState: Bundle
+    ) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        currentNote = savedInstanceState.getInt("CURRENT_NOTE")
+        noteName?.setText(savedInstanceState.getString("NOTE_NAME"))
+        noteDescription?.setText(savedInstanceState.getString("NOTE_DESCRIPTION"))
+
+        val savedNotes = savedInstanceState.getParcelableArrayList<TaskModel>("NOTES")?.toMutableList()
+
+        if (savedNotes != null) {
+            notes.clear()
+            notes.addAll(savedNotes)
+        }
+
+        showNote()
+        showToast("Восстановление данных")
+
+    }
+
     // onStart: Этот метод вызывается, когда активность становится видимой для пользователя. Например, после перехода с другой активности или при запуске приложения. Пример:
     override fun onStart() {
         super.onStart()

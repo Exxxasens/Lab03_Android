@@ -1,5 +1,6 @@
 package com.example.lab03
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -20,12 +21,16 @@ class SecondActivity: AppCompatActivity() {
         saveNoteButton = findViewById(R.id.saveNoteButton2)
 
         val bundle = intent.extras
-        noteName?.setText(bundle?.getString("TO_EDIT_NOTE_NAME"))
-        noteDescription?.setText(bundle?.getString("TO_EDIT_NOTE_DESCRIPTION"))
+        noteName?.setText(bundle?.getString("EDIT_NOTE_NAME"))
+        noteDescription?.setText(bundle?.getString("EDIT_NOTE_DESCRIPTION"))
 
     }
 
-    fun saveNote(view: View) {
-        
+    fun onSaveNote(view: View) {
+        val intent = Intent()
+        intent.putExtra("EDITED_NOTE_NAME", noteName?.text.toString())
+        intent.putExtra("EDITED_NOTE_DESCRIPTION", noteDescription?.text.toString())
+        setResult(RESULT_OK, intent)
+        finish()
     }
 }

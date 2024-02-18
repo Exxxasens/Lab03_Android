@@ -47,6 +47,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editNoteDescription2"
-        android:onClick="saveNote"
+        android:onClick="onSaveNote"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

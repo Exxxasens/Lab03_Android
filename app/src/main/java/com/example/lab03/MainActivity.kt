@@ -1,12 +1,14 @@
 package com.example.lab03
 
-import androidx.appcompat.app.AppCompatActivity
+import android.R.attr.value
+import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
     private var noteName: EditText? = null
@@ -63,6 +65,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun saveNote(view: View) {
+        val intent = Intent(this@MainActivity, SecondActivity::class.java)
+        intent.putExtra("TO_EDIT_NOTE_NAME", notes[currentNote].name)
+        intent.putExtra("TO_EDIT_NOTE_DESCRIPTION", notes[currentNote].description)
+        intent.putExtra("TO_EDIT_NOTE_ID", currentNote)
+        startActivity(intent)
+
+
+        /*
         val name = noteName?.text.toString()
         val description = noteDescription?.text.toString()
 
@@ -75,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         note.description = description
 
         showToast("Заметка отредактирована")
-
+        */
     }
 
     fun addNote(view: View) {

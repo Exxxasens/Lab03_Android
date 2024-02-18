@@ -1,6 +1,7 @@
 package com.example.lab03
 
 import android.R.attr.value
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -66,26 +67,28 @@ class MainActivity : AppCompatActivity() {
 
     fun saveNote(view: View) {
         val intent = Intent(this@MainActivity, SecondActivity::class.java)
-        intent.putExtra("TO_EDIT_NOTE_NAME", notes[currentNote].name)
-        intent.putExtra("TO_EDIT_NOTE_DESCRIPTION", notes[currentNote].description)
-        intent.putExtra("TO_EDIT_NOTE_ID", currentNote)
-        startActivity(intent)
+        intent.putExtra("EDIT_NOTE_NAME", notes[currentNote].name)
+        intent.putExtra("EDIT_NOTE_DESCRIPTION", notes[currentNote].description)
+        intent.putExtra("EDIT_NOTE_ID", currentNote)
+        startActivityForResult(intent, 1)
+    }
 
 
-        /*
-        val name = noteName?.text.toString()
-        val description = noteDescription?.text.toString()
-
-        // notes.add(TaskModel(notes.size, name, description))
-
-        // Находим нужную заметку
-        val note = notes[currentNote]
-
-        note.name = name
-        note.description = description
-
-        showToast("Заметка отредактирована")
-        */
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        showToast("ON ACTIVITY RESULT ")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                showToast("")
+                val newName = data.getStringExtra("EDITED_NOTE_NAME")
+                val newDescription = data.getStringExtra("EDITED_NOTE_DESCRIPTION")
+                notes[currentNote].name = newName ?: ""
+                notes[currentNote].description = newDescription ?: ""
+                showToast("NEW NOTE NAME $newName")
+                showNote()
+            }
+        }
     }
 
     fun addNote(view: View) {

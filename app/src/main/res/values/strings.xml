@@ -3,7 +3,7 @@
     <string name="note_name">Название</string>
     <string name="note_description">Описание</string>
     <string name="button_add_text">Добавить</string>
-    <string name="button_save_text">Сохранить</string>
+    <string name="button_edit_text">Редактировать</string>
     <string name="button_random_text">Показать последнюю заметку</string>
     <string name="button_next_content_description">Следующая заметка</string>
     <string name="button_prev_content_description">Предыдущая заметка</string>

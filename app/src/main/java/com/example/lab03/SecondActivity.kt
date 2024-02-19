@@ -21,15 +21,19 @@ class SecondActivity: AppCompatActivity() {
         saveNoteButton = findViewById(R.id.saveNoteButton2)
 
         val bundle = intent.extras
-        noteName?.setText(bundle?.getString("EDIT_NOTE_NAME"))
-        noteDescription?.setText(bundle?.getString("EDIT_NOTE_DESCRIPTION"))
+        noteName?.setText(bundle?.getString(NOTE_NAME))
+        noteDescription?.setText(bundle?.getString(NOTE_DESCRIPTION))
 
     }
 
     fun onSaveNote(view: View) {
+        sendResult()
+    }
+
+    private fun sendResult() {
         val intent = Intent()
-        intent.putExtra("EDITED_NOTE_NAME", noteName?.text.toString())
-        intent.putExtra("EDITED_NOTE_DESCRIPTION", noteDescription?.text.toString())
+        intent.putExtra(NOTE_NAME, noteName?.text.toString())
+        intent.putExtra(NOTE_DESCRIPTION, noteDescription?.text.toString())
         setResult(RESULT_OK, intent)
         finish()
     }

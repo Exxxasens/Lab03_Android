@@ -14,7 +14,7 @@ const val NOTE_NAME = "NOTE_NAME"
 const val NOTE_DESCRIPTION = "NOTE_DESCRIPTION"
 
 
-class EditNoteContract : ActivityResultContract<EditNoteData, EditNoteData?>() {
+class SecondActivityContract : ActivityResultContract<EditNoteData, EditNoteData?>() {
     override fun createIntent(context: Context, input: EditNoteData): Intent {
         return Intent(context, SecondActivity::class.java)
             .putExtra(NOTE_NAME, input.name)

@@ -2,39 +2,33 @@ package com.example.lab03
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 
-class SecondActivity: AppCompatActivity() {
-    private var noteName: EditText? = null
-    private var noteDescription: EditText? = null
-    private var saveNoteButton: Button? = null
+class SecondActivity: AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.second_activity)
 
-        noteName = findViewById(R.id.editNoteName2)
-        noteDescription = findViewById(R.id.editNoteDescription2)
-        saveNoteButton = findViewById(R.id.saveNoteButton2)
-
-        val bundle = intent.extras
-        noteName?.setText(bundle?.getString(NOTE_NAME))
-        noteDescription?.setText(bundle?.getString(NOTE_DESCRIPTION))
-
+        if (savedInstanceState == null) {
+            var fragment = SecondFragment()
+            fragment.setNoteName(intent.getStringExtra(NOTE_NAME))
+            fragment.setNoteDescription(intent.getStringExtra(NOTE_DESCRIPTION))
+            Log.d("ADD_FRAGMENT", "new added second")
+            supportFragmentManager.beginTransaction().replace(R.id.SecondFragmentContainerView, fragment, "SecondFragment").commit()
+        }
     }
 
-    fun onSaveNote(view: View) {
-        sendResult()
-    }
-
-    private fun sendResult() {
+    override fun onSaveButtonClicked(name: String, description: String) {
         val intent = Intent()
-        intent.putExtra(NOTE_NAME, noteName?.text.toString())
-        intent.putExtra(NOTE_DESCRIPTION, noteDescription?.text.toString())
+        intent.putExtra(NOTE_NAME, name)
+        intent.putExtra(NOTE_DESCRIPTION,description)
         setResult(RESULT_OK, intent)
         finish()
     }
+
 }

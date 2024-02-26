@@ -75,10 +75,12 @@ class SecondFragment : Fragment() {
 
     public fun setNoteName(name: String?) {
         noteNameString = name ?: ""
+        noteName?.setText(noteNameString)
     }
 
     public fun setNoteDescription(description: String?) {
         noteDescriptionString = description ?: ""
+        noteDescription?.setText(noteDescriptionString)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 class FirstFragment : Fragment() {
     // ViewModel
     private lateinit var myViewModel: MyViewModel
-    private var listAdapter: ListAdapter? = null
+    private lateinit var listAdapter: ListAdapter
 
 
     override fun onCreateView(
@@ -23,18 +23,20 @@ class FirstFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         myViewModel = ViewModelProvider(requireActivity())[MyViewModel::class.java]
+        listAdapter = ListAdapter(inflater.context, ArrayList(myViewModel.getAllNotes()))
+
         return inflater.inflate(R.layout.fragment_first, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val listView = view.findViewById<ListView>(R.id.listView)
-        listAdapter = ListAdapter(view.context, ArrayList(myViewModel.getAllNotes()))
+
         listView.adapter = listAdapter
         listView.onItemClickListener = AdapterView.OnItemClickListener{ parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
             if (context is MainActivity) {
-                (context as MainActivity).runSecondAcitvity(position)
-                myViewModel.selectedIndex = position
+                (context as MainActivity).setSelectedIndex(position)
+
             }
         }
 
@@ -47,7 +49,7 @@ class FirstFragment : Fragment() {
     }
 
     fun refreshListView() {
-        listAdapter?.notifyDataSetChanged()
+        listAdapter.notifyDataSetChanged()
     }
 
 }

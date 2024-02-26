@@ -6,9 +6,6 @@ import androidx.lifecycle.ViewModel
 
 class TaskModel(var name: String, var description: String)
 open class MyViewModel: ViewModel() {
-    private val mutableSelectedIndex = MutableLiveData<Int>()
-    var selectedIndex: Int = 0
-
     var notes = mutableListOf<TaskModel>(
          TaskModel("Заметка про лабы", "Нужно все сделать"),
          TaskModel( "Вторая заметка", "Описание второй заметки"))

@@ -2,31 +2,32 @@ package com.example.lab03
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 
 
 class SecondFragment : Fragment() {
 
-    // Interface for communication with the activity
     interface OnSaveButtonListener {
-        fun onSaveButtonClicked(name: String, description: String)
+        fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean?)
     }
 
     // Declare an instance of the interface
-    var onButtonClickListener: OnSaveButtonListener? = null
+    private var onButtonClickListener: OnSaveButtonListener? = null
 
 
-    private var noteNameString: String? = null
-    private var noteDescriptionString: String? = null
+    private var name: String? = null
+    private var description: String? = null
+    private var isChecked: Boolean? = null
 
     private var noteName: EditText? = null
     private var noteDescription: EditText? = null
+    private var checkBox: CheckBox? = null
     private var saveNoteButton: Button? = null
 
     override fun onAttach(context: Context) {
@@ -35,11 +36,6 @@ class SecondFragment : Fragment() {
         if (context is OnSaveButtonListener) {
             onButtonClickListener = context
         }
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -57,36 +53,29 @@ class SecondFragment : Fragment() {
         noteName = fragmentView?.findViewById(R.id.noteName)
         noteDescription = fragmentView?.findViewById(R.id.noteDescription)
         saveNoteButton = fragmentView?.findViewById(R.id.saveNoteButton)
+        checkBox = fragmentView?.findViewById(R.id.checkBox)
 
-        if (savedInstanceState != null) {
-            noteName?.setText(savedInstanceState.getString("CURRENT_NAME"))
-            noteDescription?.setText(savedInstanceState.getString("CURRENT_DESCRIPTION"))
-        } else {
-            noteName?.setText(noteNameString)
-            noteDescription?.setText(noteDescriptionString)
+        if (savedInstanceState == null) {
+            noteName?.setText(name)
+            noteDescription?.setText(description)
+            checkBox?.isChecked = isChecked as Boolean
         }
-
 
         saveNoteButton?.setOnClickListener {
-            onButtonClickListener?.onSaveButtonClicked(noteName?.text.toString(), noteDescription?.text.toString())
+            onButtonClickListener?.onSaveButtonClicked(noteName?.text.toString(), noteDescription?.text.toString(), checkBox?.isChecked)
         }
 
     }
 
-    public fun setNoteName(name: String?) {
-        noteNameString = name ?: ""
-        noteName?.setText(noteNameString)
+    fun setNote(n: String, d: String, b: Boolean) {
+        name = n
+        description = d
+        isChecked = b
+
+        noteName?.setText(name)
+        noteDescription?.setText(description)
+        checkBox?.isChecked = isChecked as Boolean
     }
 
-    public fun setNoteDescription(description: String?) {
-        noteDescriptionString = description ?: ""
-        noteDescription?.setText(noteDescriptionString)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("CURRENT_NAME", noteName?.text.toString())
-        outState.putString("CURRENT_DESCRIPTION", noteDescription?.text.toString())
-    }
 
 }

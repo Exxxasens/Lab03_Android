@@ -25,16 +25,16 @@ class FirstFragment : Fragment() {
 
         myAdapter = RecyclerAdapter(ArrayList(myViewModel.getAllNotes()), object : RecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                if (context is MainActivity) {
-                    (context as MainActivity).setSelectedIndex(position)
-                }
+                myViewModel.selectNoteIndex(position)
             }
             override fun onCheckBoxClick(position: Int, isChecked: Boolean) {
-                if (context is MainActivity) {
-                    (context as MainActivity).onCheckboxClicked(position, isChecked)
-                }
+                myViewModel.updateNote(position, isChecked)
             }
         })
+
+        myViewModel.notes.observe(viewLifecycleOwner) { notes ->
+            myAdapter.updateData(notes)
+        }
 
         return inflater.inflate(R.layout.fragment_first, container, false)
     }
@@ -47,9 +47,6 @@ class FirstFragment : Fragment() {
         recyclerView.adapter = myAdapter
     }
 
-    fun refreshList(position: Int) {
-        myAdapter.notifyItemChanged(position)
-    }
 
     companion object {
         @JvmStatic

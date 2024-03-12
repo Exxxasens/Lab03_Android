@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerAdapter(private val dataArrayList: ArrayList<TaskModel>, private val onItemClickListener: OnItemClickListener) :
+class RecyclerAdapter(private var dataArrayList: ArrayList<TaskModel>, private val onItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
@@ -49,7 +49,13 @@ class RecyclerAdapter(private val dataArrayList: ArrayList<TaskModel>, private v
 
     }
 
+
     override fun getItemCount(): Int {
         return dataArrayList.size
+    }
+
+    fun updateData(newData: List<TaskModel>) {
+        dataArrayList = ArrayList(newData)
+        notifyDataSetChanged()
     }
 }

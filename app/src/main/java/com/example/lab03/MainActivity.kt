@@ -1,8 +1,10 @@
 package com.example.lab03
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
@@ -10,12 +12,16 @@ class MainActivity : AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
     private var firstFragment: FirstFragment = FirstFragment.newInstance()
     private var secondFragment: SecondFragment? = null
 
-    private var selectedIndex: Int = 0
-
-    private var secondActivity = registerForActivityResult(SecondActivityContract()) {
+    private var editNote = registerForActivityResult(SecondActivityContract()) {
         if (it != null) {
+            val selectedIndex  = myViewModel.getSelectedIndex()
             myViewModel.updateNote(selectedIndex, it.name, it.description, it.isChecked)
-            firstFragment.refreshList(selectedIndex)
+        }
+    }
+
+    private var createNote = registerForActivityResult(SecondActivityContract()) {
+        if (it != null) {
+            myViewModel.createNote(it.name, it.description, it.isChecked)
         }
     }
 
@@ -29,48 +35,69 @@ class MainActivity : AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
 
         if (findViewById<FragmentContainerView>(R.id.SecondFragmentContainerView) != null) {
             secondFragment = SecondFragment()
-            setDataSecondFragment()
+            setDataSecondFragment(myViewModel.getSelectedIndex())
             supportFragmentManager.beginTransaction().replace(R.id.SecondFragmentContainerView,
                 secondFragment!!, "SecondFragment").commit()
         }
 
-    }
-    private fun runSecondAcitvity() {
-        val note = myViewModel.getNote(selectedIndex)
-        secondActivity.launch(
-            object : EditNoteData {
-                override val name = note.name
-                override val description = note.description
-                override val isChecked = note.isChecked
+        myViewModel.noteIndex.observe(this) { index ->
+            if (index != null) {
+                onIndexSelect(index)
             }
-        )
+        }
+
+        if (secondFragment != null) {
+            myViewModel.notes.observe(this, Observer<List<TaskModel>> { notes ->
+                setDataSecondFragment(myViewModel.getSelectedIndex())
+            })
+        }
+
+    }
+    private fun runEditNote(index: Int) {
+        val note = myViewModel.getNote(index)
+        if (note != null) {
+            editNote.launch(
+                object : InputNoteData {
+                    override val name = note.name
+                    override val description = note.description
+                    override val isChecked = note.isChecked
+                    override val isCreating = false
+                }
+            )
+        }
     }
 
-    fun setSelectedIndex(index: Int) {
-        selectedIndex = index
+    private fun runCreateNote() {
+        createNote.launch(object : InputNoteData {
+            override val name = ""
+            override val description = ""
+            override val isChecked = false
+            override val isCreating = true
+        })
+    }
+
+    private fun onIndexSelect(index: Int) {
         if (secondFragment != null) {
-            setDataSecondFragment()
+            setDataSecondFragment(index)
             return
         }
-        runSecondAcitvity()
+        runEditNote(index)
     }
 
-    fun onCheckboxClicked(index: Int, isChecked: Boolean) {
-        myViewModel.updateNote(index, isChecked)
-        // Если два фрагмента на экране, обновить на втором экране чекбокс
-        if (secondFragment != null) {
-            setDataSecondFragment()
+    private fun setDataSecondFragment(index: Int) {
+        val note = myViewModel.getNote(index)
+        if (note != null) {
+            secondFragment?.setNote(note.name, note.description, note.isChecked)
         }
-    }
-
-    private fun setDataSecondFragment() {
-        val note = myViewModel.getNote(selectedIndex)
-        secondFragment?.setNote(note.name, note.description, note.isChecked)
     }
 
     override fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean?) {
+        val selectedIndex = myViewModel.getSelectedIndex()
         myViewModel.updateNote(selectedIndex, name, description, isChecked ?: false)
-        firstFragment.refreshList(selectedIndex)
+    }
+
+    fun onNoteCreate(view: View) {
+        runCreateNote()
     }
 
 }

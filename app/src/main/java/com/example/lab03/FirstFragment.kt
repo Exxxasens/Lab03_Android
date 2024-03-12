@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class FirstFragment : Fragment() {
     // ViewModel
-    private lateinit var myViewModel: MyViewModel
+    private lateinit var myViewModel: NoteViewModel
     private lateinit var myAdapter: RecyclerAdapter
 
 
@@ -21,19 +21,19 @@ class FirstFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        myViewModel = ViewModelProvider(requireActivity())[MyViewModel::class.java]
+        myViewModel = ViewModelProvider(requireActivity())[NoteViewModel::class.java]
 
-        myAdapter = RecyclerAdapter(ArrayList(myViewModel.getAllNotes()), object : RecyclerAdapter.OnItemClickListener {
-            override fun onItemClick(position: Int) {
-                myViewModel.selectNoteIndex(position)
+        myAdapter = RecyclerAdapter(ArrayList(), object : RecyclerAdapter.OnItemClickListener {
+            override fun onItemClick(id: Int) {
+                myViewModel.selectNoteId(id)
             }
-            override fun onCheckBoxClick(position: Int, isChecked: Boolean) {
-                myViewModel.updateNote(position, isChecked)
+            override fun onCheckBoxClick(note: Note, isChecked: Boolean) {
+                myViewModel.updateNote(Note(note.name, note.description, isChecked, note.resourceId, note.id))
             }
         })
 
-        myViewModel.notes.observe(viewLifecycleOwner) { notes ->
-            myAdapter.updateData(notes)
+        myViewModel.notes.observe(viewLifecycleOwner) { task ->
+            myAdapter.updateData(task)
         }
 
         return inflater.inflate(R.layout.fragment_first, container, false)

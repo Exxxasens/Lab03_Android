@@ -1,74 +1,65 @@
 package com.example.lab03
 
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentContainerView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
-class MainActivity : AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
-    private lateinit var myViewModel: MyViewModel
+class MainActivity : AppCompatActivity() {
     private var firstFragment: FirstFragment = FirstFragment.newInstance()
-    private var secondFragment: SecondFragment? = null
+
+
+    private lateinit var myViewModel: NoteViewModel
+    private lateinit var database: NoteDatabase
 
     private var editNote = registerForActivityResult(SecondActivityContract()) {
         if (it != null) {
-            val selectedIndex  = myViewModel.getSelectedIndex()
-            myViewModel.updateNote(selectedIndex, it.name, it.description, it.isChecked)
+            if (it.shouldDelete) {
+                myViewModel.deleteNote(it.id)
+
+            } else {
+                myViewModel.updateNote(Note(it.name, it.description, it.isChecked, R.drawable.no_image, it.id))
+            }
         }
+
     }
 
     private var createNote = registerForActivityResult(SecondActivityContract()) {
         if (it != null) {
-            myViewModel.createNote(it.name, it.description, it.isChecked)
+            myViewModel.insertNote(Note(it.name, it.description, it.isChecked, R.drawable.no_image))
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
+
+        database = NoteDatabase.getDatabase(applicationContext)
+
+        // Creating ViewModel
+        val factory = TaskViewModelFactory(database.dao)
+        myViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
         supportFragmentManager.beginTransaction().replace(R.id.MainFragmentContainerView,
             firstFragment, "FirstFragment").commit()
 
-        if (findViewById<FragmentContainerView>(R.id.SecondFragmentContainerView) != null) {
-            secondFragment = SecondFragment()
-            setDataSecondFragment(myViewModel.getSelectedIndex())
-            supportFragmentManager.beginTransaction().replace(R.id.SecondFragmentContainerView,
-                secondFragment!!, "SecondFragment").commit()
-        }
 
-        myViewModel.noteIndex.observe(this) { index ->
-            if (index != null) {
-                onIndexSelect(index)
+        myViewModel.selectedNoteId.observe(this) { id ->
+            if (id != null) {
+                val task = GetNoteByIdAsyncTask(database.dao) {
+                    runEditNote(it)
+                }.execute(id)
             }
         }
 
-        if (secondFragment != null) {
-            myViewModel.notes.observe(this, Observer<List<TaskModel>> { notes ->
-                setDataSecondFragment(myViewModel.getSelectedIndex())
-            })
-        }
 
     }
-    private fun runEditNote(index: Int) {
-        val note = myViewModel.getNote(index)
-        if (note != null) {
-            editNote.launch(
-                object : InputNoteData {
-                    override val name = note.name
-                    override val description = note.description
-                    override val isChecked = note.isChecked
-                    override val isCreating = false
-                }
-            )
-        }
-    }
 
-    private fun runCreateNote() {
+
+    fun onNoteCreate(view: View) {
         createNote.launch(object : InputNoteData {
+            override val id = null
             override val name = ""
             override val description = ""
             override val isChecked = false
@@ -76,28 +67,31 @@ class MainActivity : AppCompatActivity(), SecondFragment.OnSaveButtonListener  {
         })
     }
 
-    private fun onIndexSelect(index: Int) {
-        if (secondFragment != null) {
-            setDataSecondFragment(index)
-            return
+    private fun runEditNote(note: Note) {
+        editNote.launch(
+            object : InputNoteData {
+                override val id = note.id
+                override val name = note.name
+                override val description = note.description
+                override val isChecked = note.isChecked
+                override val isCreating = false
+            }
+        )
+    }
+
+    class GetNoteByIdAsyncTask(private val noteDao: NoteDao, private val callback: (Note) -> Unit) : AsyncTask<Int, Void, Note?> () {
+        override fun doInBackground(vararg params: Int?): Note? {
+            return noteDao.getNote(params[0] ?: return null)
         }
-        runEditNote(index)
-    }
 
-    private fun setDataSecondFragment(index: Int) {
-        val note = myViewModel.getNote(index)
-        if (note != null) {
-            secondFragment?.setNote(note.name, note.description, note.isChecked)
+        override fun onPostExecute(result: Note?) {
+            super.onPostExecute(result)
+            if (result != null) {
+                callback(result)
+            }
         }
     }
 
-    override fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean?) {
-        val selectedIndex = myViewModel.getSelectedIndex()
-        myViewModel.updateNote(selectedIndex, name, description, isChecked ?: false)
-    }
-
-    fun onNoteCreate(view: View) {
-        runCreateNote()
-    }
 
 }
+

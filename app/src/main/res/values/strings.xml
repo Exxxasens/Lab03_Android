@@ -9,4 +9,5 @@
     <string name="button_prev_content_description">Предыдущая заметка</string>
     <string name="checkBoxText">Выполнено</string>
     <string name="add_button">Добавить заметку</string>
+    <string name="deleteButtonText">Удалить</string>
 </resources>

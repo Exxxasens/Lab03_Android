@@ -13,28 +13,30 @@ import androidx.fragment.app.Fragment
 
 class SecondFragment : Fragment() {
 
-    interface OnSaveButtonListener {
+    interface ButtonListener {
         fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean?)
+        fun onDeleteButtonClicked()
     }
 
     // Declare an instance of the interface
-    private var onButtonClickListener: OnSaveButtonListener? = null
+    private var buttonListener: ButtonListener? = null
 
 
     private var name: String? = null
     private var description: String? = null
-    private var isChecked: Boolean? = null
+    private var isChecked: Boolean = false
 
     private var noteName: EditText? = null
     private var noteDescription: EditText? = null
     private var checkBox: CheckBox? = null
     private var saveNoteButton: Button? = null
+    private var deleteButton: Button? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Ensure the hosting activity implements the interface
-        if (context is OnSaveButtonListener) {
-            onButtonClickListener = context
+        if (context is ButtonListener) {
+            buttonListener = context
         }
     }
 
@@ -54,6 +56,7 @@ class SecondFragment : Fragment() {
         noteDescription = fragmentView?.findViewById(R.id.noteDescription)
         saveNoteButton = fragmentView?.findViewById(R.id.saveNoteButton)
         checkBox = fragmentView?.findViewById(R.id.checkBox)
+        deleteButton = fragmentView?.findViewById(R.id.deleteButton)
 
         if (savedInstanceState == null) {
             noteName?.setText(name)
@@ -62,9 +65,12 @@ class SecondFragment : Fragment() {
         }
 
         saveNoteButton?.setOnClickListener {
-            onButtonClickListener?.onSaveButtonClicked(noteName?.text.toString(), noteDescription?.text.toString(), checkBox?.isChecked)
+            buttonListener?.onSaveButtonClicked(noteName?.text.toString(), noteDescription?.text.toString(), checkBox?.isChecked)
         }
 
+        deleteButton?.setOnClickListener {
+            buttonListener?.onDeleteButtonClicked()
+        }
     }
 
     fun setNote(n: String, d: String, b: Boolean) {

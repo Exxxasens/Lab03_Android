@@ -8,12 +8,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerAdapter(private var dataArrayList: ArrayList<TaskModel>, private val onItemClickListener: OnItemClickListener) :
+class RecyclerAdapter(private var dataArrayList: ArrayList<Note>, private val onItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
-        fun onCheckBoxClick(position: Int, isChecked: Boolean)
+        fun onCheckBoxClick(position: Note, isChecked: Boolean)
 
     }
 
@@ -35,16 +35,16 @@ class RecyclerAdapter(private var dataArrayList: ArrayList<TaskModel>, private v
         holder.noteName.text = listData.name
         holder.noteDescription.text = listData.description
         holder.noteCheckBox.isChecked = listData.isChecked == true
-        holder.noteImage.setImageResource(listData.imageResource)
+        holder.noteImage.setImageResource(listData.resourceId)
 
         holder.itemView.setOnClickListener {
             // Notify the listener about the item click
-            onItemClickListener.onItemClick(position)
+            onItemClickListener.onItemClick(dataArrayList[position].id)
         }
 
         holder.noteCheckBox.setOnClickListener {
             val isChecked = holder.noteCheckBox.isChecked
-            onItemClickListener.onCheckBoxClick(position, isChecked)
+            onItemClickListener.onCheckBoxClick(dataArrayList[position], isChecked)
         }
 
     }
@@ -54,7 +54,7 @@ class RecyclerAdapter(private var dataArrayList: ArrayList<TaskModel>, private v
         return dataArrayList.size
     }
 
-    fun updateData(newData: List<TaskModel>) {
+    fun updateData(newData: List<Note>) {
         dataArrayList = ArrayList(newData)
         notifyDataSetChanged()
     }

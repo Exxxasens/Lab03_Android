@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -15,6 +17,7 @@ class FirstFragment : Fragment() {
     private lateinit var myViewModel: NoteViewModel
     private lateinit var myAdapter: RecyclerAdapter
 
+    private var createNoteButton: AppCompatButton? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,12 +48,16 @@ class FirstFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = myAdapter
-    }
 
+        val fragmentView = getView()
+        createNoteButton = fragmentView?.findViewById(R.id.createNoteButton)
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = FirstFragment()
+        createNoteButton?.setOnClickListener {
+            val bundle = Bundle().apply {
+                putBoolean(NOTE_SHOULD_CREATE, true)
+            }
+            findNavController().navigate(R.id.action_main_to_edit_note, bundle)
+        }
     }
 
 

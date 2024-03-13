@@ -14,23 +14,22 @@ import androidx.fragment.app.Fragment
 class SecondFragment : Fragment() {
 
     interface ButtonListener {
-        fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean?)
-        fun onDeleteButtonClicked()
+        fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean, id: Int)
+        fun onDeleteButtonClicked(id: Int)
+        fun onCreateButtonClicked(name: String, description: String, isChecked: Boolean)
     }
 
     // Declare an instance of the interface
     private var buttonListener: ButtonListener? = null
-
-
-    private var name: String? = null
-    private var description: String? = null
-    private var isChecked: Boolean = false
 
     private var noteName: EditText? = null
     private var noteDescription: EditText? = null
     private var checkBox: CheckBox? = null
     private var saveNoteButton: Button? = null
     private var deleteButton: Button? = null
+
+    private var id: Int? = null
+    private var shouldCreate: Boolean = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,29 +57,37 @@ class SecondFragment : Fragment() {
         checkBox = fragmentView?.findViewById(R.id.checkBox)
         deleteButton = fragmentView?.findViewById(R.id.deleteButton)
 
-        if (savedInstanceState == null) {
-            noteName?.setText(name)
-            noteDescription?.setText(description)
-            checkBox?.isChecked = isChecked as Boolean
+        arguments?.let {
+            if (it.getBoolean(NOTE_SHOULD_CREATE)) {
+                saveNoteButton?.text = "Создать"
+                shouldCreate = true
+            } else {
+                noteName?.setText(it.getString(NOTE_NAME))
+                noteDescription?.setText(it.getString(NOTE_DESCRIPTION))
+                checkBox?.isChecked = it.getBoolean(NOTE_IS_CHECKED)
+                id = it.getInt(NOTE_ID)
+            }
+
         }
 
         saveNoteButton?.setOnClickListener {
-            buttonListener?.onSaveButtonClicked(noteName?.text.toString(), noteDescription?.text.toString(), checkBox?.isChecked)
+            val name = noteName?.text.toString()
+            val description = noteDescription?.text.toString()
+            val isChecked = checkBox?.isChecked ?: false
+
+            if (shouldCreate) {
+                buttonListener?.onCreateButtonClicked(name, description, isChecked)
+            } else if (id != null) {
+                buttonListener?.onSaveButtonClicked(name, description, isChecked, id!!)
+            }
         }
 
         deleteButton?.setOnClickListener {
-            buttonListener?.onDeleteButtonClicked()
+            if (id != null) {
+                buttonListener?.onDeleteButtonClicked(id!!)
+            }
+
         }
-    }
-
-    fun setNote(n: String, d: String, b: Boolean) {
-        name = n
-        description = d
-        isChecked = b
-
-        noteName?.setText(name)
-        noteDescription?.setText(description)
-        checkBox?.isChecked = isChecked as Boolean
     }
 
 

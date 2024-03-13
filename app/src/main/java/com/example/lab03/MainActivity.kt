@@ -2,38 +2,30 @@ package com.example.lab03
 
 import android.os.AsyncTask
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 
-class MainActivity : AppCompatActivity() {
-    private var firstFragment: FirstFragment = FirstFragment.newInstance()
+const val NOTE_ID = "NOTE_ID"
+const val NOTE_NAME = "NOTE_NAME"
+const val NOTE_DESCRIPTION = "NOTE_DESCRIPTION"
+const val NOTE_IS_CHECKED = "NOTE_IS_CHECKED"
+const val NOTE_SHOULD_CREATE = "NOTE_SHOULD_CREATE"
 
 
+class MainActivity : AppCompatActivity(), SecondFragment.ButtonListener {
     private lateinit var myViewModel: NoteViewModel
     private lateinit var database: NoteDatabase
-
-    private var editNote = registerForActivityResult(SecondActivityContract()) {
-        if (it != null) {
-            if (it.shouldDelete) {
-                myViewModel.deleteNote(it.id)
-
-            } else {
-                myViewModel.updateNote(Note(it.name, it.description, it.isChecked, R.drawable.no_image, it.id))
-            }
-        }
-
-    }
-
-    private var createNote = registerForActivityResult(SecondActivityContract()) {
-        if (it != null) {
-            myViewModel.insertNote(Note(it.name, it.description, it.isChecked, R.drawable.no_image))
-        }
-    }
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
 
         database = NoteDatabase.getDatabase(applicationContext)
 
@@ -41,14 +33,11 @@ class MainActivity : AppCompatActivity() {
         val factory = TaskViewModelFactory(database.dao)
         myViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
-        supportFragmentManager.beginTransaction().replace(R.id.MainFragmentContainerView,
-            firstFragment, "FirstFragment").commit()
-
 
         myViewModel.selectedNoteId.observe(this) { id ->
             if (id != null) {
-                val task = GetNoteByIdAsyncTask(database.dao) {
-                    runEditNote(it)
+                GetNoteByIdAsyncTask(database.dao) {
+                    navigateToEditNote(it)
                 }.execute(id)
             }
         }
@@ -56,27 +45,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-    fun onNoteCreate(view: View) {
-        createNote.launch(object : InputNoteData {
-            override val id = null
-            override val name = ""
-            override val description = ""
-            override val isChecked = false
-            override val isCreating = true
-        })
-    }
-
-    private fun runEditNote(note: Note) {
-        editNote.launch(
-            object : InputNoteData {
-                override val id = note.id
-                override val name = note.name
-                override val description = note.description
-                override val isChecked = note.isChecked
-                override val isCreating = false
-            }
-        )
+    private fun navigateToEditNote(note: Note) {
+        val bundle = Bundle().apply {
+            putInt(NOTE_ID, note.id)
+            putString(NOTE_NAME, note.name)
+            putString(NOTE_DESCRIPTION, note.description)
+            putBoolean(NOTE_IS_CHECKED, note.isChecked)
+        }
+        navController.navigate(R.id.action_main_to_edit_note, bundle)
     }
 
     class GetNoteByIdAsyncTask(private val noteDao: NoteDao, private val callback: (Note) -> Unit) : AsyncTask<Int, Void, Note?> () {
@@ -92,6 +68,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateButtonClicked(name: String, description: String, isChecked: Boolean) {
+        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+        myViewModel.insertNote(Note(name, description, isChecked, R.drawable.no_image))
+    }
+
+    override fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean, id: Int) {
+        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+        myViewModel.updateNote(Note(name, description, isChecked, R.drawable.no_image, id))
+    }
+
+    override fun onDeleteButtonClicked(id: Int) {
+        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+        myViewModel.deleteNote(id)
+    }
 
 }
 

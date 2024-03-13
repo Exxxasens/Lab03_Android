@@ -69,18 +69,20 @@ class MainActivity : AppCompatActivity(), SecondFragment.ButtonListener {
     }
 
     override fun onCreateButtonClicked(name: String, description: String, isChecked: Boolean) {
-        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+
         myViewModel.insertNote(Note(name, description, isChecked, R.drawable.no_image))
     }
 
     override fun onSaveButtonClicked(name: String, description: String, isChecked: Boolean, id: Int) {
-        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+        // navController.navigate(R.id.action_secondFragment_to_firstFragment)
         myViewModel.updateNote(Note(name, description, isChecked, R.drawable.no_image, id))
+        myViewModel.unselectNote()
     }
 
     override fun onDeleteButtonClicked(id: Int) {
-        navController.navigate(R.id.action_secondFragment_to_firstFragment)
+        // navController.navigate(R.id.action_secondFragment_to_firstFragment)
         myViewModel.deleteNote(id)
+
     }
 
 }

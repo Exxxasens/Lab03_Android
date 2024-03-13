@@ -16,6 +16,11 @@ class NoteViewModel( private val dao: NoteDao): ViewModel() {
     fun selectNoteId(index: Int) {
         _selectedNoteId.value = index
     }
+
+    fun unselectNote() {
+        _selectedNoteId.value = null
+    }
+
     fun getSelectedId(): Int {
         return selectedNoteId.value ?: 0
     }

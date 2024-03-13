@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 
 
 class SecondFragment : Fragment() {
@@ -60,6 +61,7 @@ class SecondFragment : Fragment() {
         arguments?.let {
             if (it.getBoolean(NOTE_SHOULD_CREATE)) {
                 saveNoteButton?.text = "Создать"
+                deleteButton?.visibility = View.INVISIBLE
                 shouldCreate = true
             } else {
                 noteName?.setText(it.getString(NOTE_NAME))
@@ -80,11 +82,14 @@ class SecondFragment : Fragment() {
             } else if (id != null) {
                 buttonListener?.onSaveButtonClicked(name, description, isChecked, id!!)
             }
+
+            findNavController().navigate(R.id.action_secondFragment_to_firstFragment)
         }
 
         deleteButton?.setOnClickListener {
             if (id != null) {
                 buttonListener?.onDeleteButtonClicked(id!!)
+                findNavController().navigate(R.id.action_secondFragment_to_firstFragment)
             }
 
         }
